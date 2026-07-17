@@ -117,7 +117,11 @@ public class EmployeeController {
     @PostMapping("/status/{status}")
     @ApiOperation(value = "启用或禁用员工账号")
     public Result startOrStop(@PathVariable Integer status, Long id) {
-        log.info("启用禁用员工: {}, {}", status, id);
+        if (status == 1) {
+            log.info("启用员工账号: {}", id);
+        } else {
+            log.info("禁用员工账号: {}", id);
+        }
         employeeService.startOrStop(status, id);
         return Result.success();
     }

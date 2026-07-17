@@ -78,12 +78,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         BeanUtils.copyProperties(employeeDTO, employee);
         employee.setStatus(StatusConstant.ENABLE);
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-        //从ThreadLocal中取出当前登陆id
-        Long currentId = BaseContext.getCurrentId();
-        employee.setCreateUser(currentId);
-        employee.setUpdateUser(currentId);
+        //        employee.setCreateTime(LocalDateTime.now());
+        //        employee.setUpdateTime(LocalDateTime.now());
+        //        //从ThreadLocal中取出当前登陆id
+        //        Long currentId = BaseContext.getCurrentId();
+        //        employee.setCreateUser(currentId);
+        //        employee.setUpdateUser(currentId);
         employeeMapper.insert(employee);
     }
 
@@ -111,9 +111,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     Employee employee = new Employee();
     employee.setId(id);
     employee.setStatus(status);
-    employee.setUpdateTime(LocalDateTime.now());
-    Long currentId = BaseContext.getCurrentId();
-    employee.setUpdateUser(currentId);
+    //    employee.setUpdateTime(LocalDateTime.now());
+    //    Long currentId = BaseContext.getCurrentId();
+    //    employee.setUpdateUser(currentId);
     employeeMapper.update(employee);
   }
 
@@ -128,9 +128,9 @@ public class EmployeeServiceImpl implements EmployeeService {
   public void update(EmployeeDTO employeeDTO) {
     Employee employee = new Employee();
     BeanUtils.copyProperties(employeeDTO, employee);
-    employee.setUpdateTime(LocalDateTime.now());
-    Long currentId = BaseContext.getCurrentId();
-    employee.setUpdateUser(currentId);
+    //    employee.setUpdateTime(LocalDateTime.now());
+    //    Long currentId = BaseContext.getCurrentId();
+    //    employee.setUpdateUser(currentId);
     employeeMapper.update(employee);
   }
 
