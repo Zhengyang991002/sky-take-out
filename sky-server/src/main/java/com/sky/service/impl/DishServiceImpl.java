@@ -4,6 +4,7 @@ package com.sky.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
@@ -116,6 +117,7 @@ public class DishServiceImpl implements DishService {
    * 修改菜品信息
    * @param dishDTO
    */
+  @Transactional
   @Override
   public void updateWithFlavor(DishDTO dishDTO) {
     // 更新基本菜品信息
@@ -134,5 +136,33 @@ public class DishServiceImpl implements DishService {
       dishFlavorMapper.saveBatch(dishFlavors);
     }
 
+  }
+
+  /**
+   * 根据分类id查询菜品
+   * @param categoryId
+   * @return
+   */
+  @Override
+  public List<Dish> getByCategoryId(Long categoryId) {
+    Dish dish = Dish.builder()
+        .categoryId(categoryId)
+        .status(StatusConstant.ENABLE)
+        .build();
+    List<Dish> dishList = dishMapper.list(dish);
+    return dishList;
+  }
+
+  /**
+   * 起售或停售菜品
+   * @param status
+   * @param id
+   */
+  @Override
+  public void startAndStop(Integer status, Long id) {
+    Dish dish = new Dish();
+    dish.setStatus(status);
+    dish.setId(id);
+    dishMapper.update(dish);
   }
 }

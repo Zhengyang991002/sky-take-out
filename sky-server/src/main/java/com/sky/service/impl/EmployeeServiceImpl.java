@@ -27,8 +27,8 @@ import org.springframework.web.servlet.LocaleResolver;
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-    @Autowired
-    private EmployeeMapper employeeMapper;
+  @Autowired
+  private EmployeeMapper employeeMapper;
   @Autowired
   private LocaleResolver localeResolver;
 

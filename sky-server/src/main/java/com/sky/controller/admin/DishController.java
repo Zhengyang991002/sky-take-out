@@ -2,6 +2,8 @@ package com.sky.controller.admin;
 
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
+import com.sky.entity.Dish;
+import com.sky.mapper.DishMapper;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -29,6 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class DishController {
   @Autowired
   private DishService dishService;
+  @Autowired
+  private DishMapper dishMapper;
 
   /**
    * 新增菜品
@@ -92,6 +96,37 @@ public class DishController {
   public Result update(@RequestBody DishDTO dishDTO) {
     log.info("修改菜品信息: {}", dishDTO);
     dishService.updateWithFlavor(dishDTO);
+    return Result.success();
+  }
+
+  /**
+   * 根据分类id查询菜品
+   * @param categoryId
+   * @return
+   */
+  @ApiOperation(value = "根据分类id查询菜品")
+  @GetMapping("/list")
+  public Result<List<Dish>> getByCategoryId(Long categoryId) {
+    log.info("根据分类id查询菜品: {}", categoryId);
+    List<Dish> dishList = dishService.getByCategoryId(categoryId);
+    return Result.success(dishList);
+  }
+
+  /**
+   * 菜品起售、停售
+   * @param status
+   * @param id
+   * @return
+   */
+  @PostMapping("/status/{status}")
+  @ApiOperation("起售停售菜品")
+  public Result startAndStop(@PathVariable Integer status, Long id) {
+    if (status == 1) {
+      log.info("起售菜品id: {}", id);
+    } else if (status == 0) {
+      log.info("停售菜品id: {}", id);
+    }
+    dishService.startAndStop(status, id);
     return Result.success();
   }
 }
