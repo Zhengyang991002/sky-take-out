@@ -83,8 +83,9 @@ public class DishServiceImpl implements DishService {
     });
 
     // 验证是否有菜品包含在套餐内
-    List<Long> dishIdsInSetmeal = setmealDishMapper.getDishIdsInSetmeal(ids);
-    if (dishIdsInSetmeal != null && !dishIdsInSetmeal.isEmpty()) {
+    List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(ids);
+    if (setmealIds != null && setmealIds.size() > 0) {
+      //当前菜品被套餐关联了，不能删除
       throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
     }
 
@@ -140,15 +141,11 @@ public class DishServiceImpl implements DishService {
 
   /**
    * 根据分类id查询菜品
-   * @param categoryId
+   * @param dish
    * @return
    */
   @Override
-  public List<Dish> getByCategoryId(Long categoryId) {
-    Dish dish = Dish.builder()
-        .categoryId(categoryId)
-        .status(StatusConstant.ENABLE)
-        .build();
+  public List<Dish> getByCategoryIdAndName(Dish dish) {
     List<Dish> dishList = dishMapper.list(dish);
     return dishList;
   }
@@ -161,6 +158,9 @@ public class DishServiceImpl implements DishService {
   @Override
   public void startAndStop(Integer status, Long id) {
     Dish dish = new Dish();
+    // 若菜品已在套餐内，则不能直接停售
+
+
     dish.setStatus(status);
     dish.setId(id);
     dishMapper.update(dish);

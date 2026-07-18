@@ -74,9 +74,7 @@
             <if test="categoryId != null">
                 and category_id = #{categoryId}
             </if>
-            <if test="status != null">
-                and status = #{status}
-            </if>
+                and status = 1
         </where>
         order by create_time desc
     </select>

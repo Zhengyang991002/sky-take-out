@@ -46,7 +46,7 @@ public interface DishService {
    * @param categoryId
    * @return
    */
-  List<Dish> getByCategoryId(Long categoryId);
+  List<Dish> getByCategoryIdAndName(Dish dish);
 
   /**
    * 起售和停售菜品
