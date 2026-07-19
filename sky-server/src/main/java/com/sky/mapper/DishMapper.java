@@ -68,6 +68,5 @@ public interface DishMapper {
      * @param categoryId
      * @return
      */
-    // TODO: find out how to fix the "name" issue
     List<Dish> list(Dish dish);
 }

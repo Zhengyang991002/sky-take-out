@@ -10,6 +10,7 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.exception.DeletionNotAllowedException;
+import com.sky.exception.DishEnableFailedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
@@ -18,6 +19,7 @@ import com.sky.result.Result;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import io.swagger.annotations.ApiOperation;
+import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -158,9 +160,15 @@ public class DishServiceImpl implements DishService {
   @Override
   public void startAndStop(Integer status, Long id) {
     Dish dish = new Dish();
-    // 若菜品已在套餐内，则不能直接停售
-
-
+    if (status == StatusConstant.DISABLE) {
+      // 查看菜品是否已在在售套餐内
+      List<Long> dishIdList = Collections.singletonList(id);
+      List<Long> setmealIds = setmealDishMapper.getEnabledSetmealIdsByDishIds(dishIdList);
+      // 若菜品已在套餐内，则不能直接停售
+      if  (setmealIds != null && setmealIds.size() > 0) {
+        throw new DishEnableFailedException(MessageConstant.DISH_ON_SALE);
+      }
+    }
     dish.setStatus(status);
     dish.setId(id);
     dishMapper.update(dish);

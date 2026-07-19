@@ -30,5 +30,13 @@
     <select id="getBysetmealId" resultType="com.sky.entity.SetmealDish">
         select * from setmeal_dish where setmeal_id = #{setmealId}
     </select>
+    <select id="getEnabledSetmealIdsByDishIds" resultType="java.lang.Long">
+        select sd.setmeal_id from setmeal_dish sd left join setmeal s on sd.setmeal_id = s.id
+        where sd.dish_id in
+        <foreach collection="dishIdList" item="dishId" separator="," open="(" close=")">
+            #{dishId}
+        </foreach>
+        and s.status = 1;
+    </select>
 
 </mapper>

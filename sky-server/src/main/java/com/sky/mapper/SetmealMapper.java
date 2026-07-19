@@ -8,6 +8,7 @@ import com.sky.enumeration.OperationType;
 import com.sky.vo.SetmealVO;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -40,13 +41,13 @@ public interface SetmealMapper {
    * @param ids
    * @return
    */
-    List<Setmeal> getByIds(List<Long> ids);
+    List<Setmeal> getByIds(@Param("ids") List<Long> ids);
 
   /**
    * 根据id批量删除套餐
    * @param ids
    */
-  void deleteBatch(List<Long> ids);
+  void deleteBatch(@Param("ids") List<Long> ids);
 
   // 根据单个id查询套餐
   @Select("select * from setmeal where id = #{id}")

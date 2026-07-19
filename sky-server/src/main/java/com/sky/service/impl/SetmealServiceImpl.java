@@ -62,6 +62,7 @@ public class SetmealServiceImpl implements SetmealService {
    * 批量删除套餐
    * @param ids
    */
+  @Transactional(rollbackFor = Exception.class)
   @Override
   public void deleteBatch(List<Long> ids) {
     // 判断套餐是否起售
@@ -99,6 +100,7 @@ public class SetmealServiceImpl implements SetmealService {
    * 修改套餐
    * @param setmealDTO
    */
+  @Transactional(rollbackFor = Exception.class)
   @Override
   public void update(SetmealDTO setmealDTO) {
     // 修改套餐基本信息
@@ -114,9 +116,9 @@ public class SetmealServiceImpl implements SetmealService {
       dishList.forEach(setmealDish -> {
         setmealDish.setSetmealId(setmealId);
       });
+      // 添加菜单新菜品
+      setmealDishMapper.saveBatch(dishList);
     }
-    // 添加菜单新菜品
-    setmealDishMapper.saveBatch(dishList);
   }
 
   /**
@@ -135,7 +137,7 @@ public class SetmealServiceImpl implements SetmealService {
       List<Dish> dishList = dishMapper.getBatchByIds(dishIds);
       dishList.forEach(dish -> {
         if (dish.getStatus() == StatusConstant.DISABLE) {
-          throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+          throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
         }
       });
     }

@@ -40,7 +40,7 @@ public class SetmealController {
    * @param setmealDTO
    * @return
    */
-  @ApiOperation(value = "新增菜品")
+  @ApiOperation(value = "新增套餐")
   @PostMapping
   public Result save(@RequestBody SetmealDTO setmealDTO) {
     log.info("新增套餐: {}", setmealDTO);
