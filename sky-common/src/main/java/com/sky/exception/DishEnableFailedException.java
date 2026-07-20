@@ -1,7 +1,7 @@
 package com.sky.exception;
 
 /**
- * 菜品启用失败异常
+ * 菜品起售失败异常
  */
 public class DishEnableFailedException extends BaseException {
 

@@ -9,16 +9,19 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.Setmeal;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.exception.DishEnableFailedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import io.swagger.annotations.ApiOperation;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +39,8 @@ public class DishServiceImpl implements DishService {
   private DishFlavorMapper dishFlavorMapper;
   @Autowired
   private SetmealDishMapper setmealDishMapper;
+  @Autowired
+  private SetmealMapper setmealMapper;
 
   /**
    * 新增菜品
@@ -164,13 +169,45 @@ public class DishServiceImpl implements DishService {
       // 查看菜品是否已在在售套餐内
       List<Long> dishIdList = Collections.singletonList(id);
       List<Long> setmealIds = setmealDishMapper.getEnabledSetmealIdsByDishIds(dishIdList);
-      // 若菜品已在套餐内，则不能直接停售
+      // 若菜品已在在售套餐内，则先停售套餐，再停售菜品
       if  (setmealIds != null && setmealIds.size() > 0) {
-        throw new DishEnableFailedException(MessageConstant.DISH_ON_SALE);
+        for (Long setmealId : setmealIds) {
+          Setmeal setmeal = new Setmeal();
+          setmeal.setId(setmealId);
+          setmeal.setStatus(StatusConstant.DISABLE);
+          setmealMapper.update(setmeal);
+        }
+        dish.setStatus(status);
+        dish.setId(id);
+        dishMapper.update(dish);
       }
     }
     dish.setStatus(status);
     dish.setId(id);
     dishMapper.update(dish);
+  }
+
+  /**
+   * 条件查询菜品和口味
+   * @param dish
+   * @return
+   */
+  public List<DishVO> listWithFlavor(Dish dish) {
+    List<Dish> dishList = dishMapper.list(dish);
+
+    List<DishVO> dishVOList = new ArrayList<>();
+
+    for (Dish d : dishList) {
+      DishVO dishVO = new DishVO();
+      BeanUtils.copyProperties(d,dishVO);
+
+      //根据菜品id查询对应的口味
+      List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
+
+      dishVO.setFlavors(flavors);
+      dishVOList.add(dishVO);
+    }
+
+    return dishVOList;
   }
 }
