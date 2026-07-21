@@ -71,6 +71,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
   }
 
+  /**
+   * 查看购物车
+   * @return
+   */
   @Override
   public List<ShoppingCart> list() {
     // 1. 获取当前用户
@@ -80,10 +84,43 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     return shoppingCartMapper.list(shoppingCart);
   }
 
+  /**
+   * 清空购物车
+   */
   @Override
   public void clean() {
     Long userId = BaseContext.getCurrentId();
     shoppingCartMapper.deleteByUserId(userId);
+  }
+
+  /**
+   * 删除购物车中一个商品
+   * @param shoppingCartDTO
+   */
+  @Override
+  public void sub(ShoppingCartDTO shoppingCartDTO) {
+    // 1. 获取当前用户
+    Long userId = BaseContext.getCurrentId();
+    // 2. 查询当前用户的购物车中要被删除的菜品或套餐
+    ShoppingCart shoppingCart = new ShoppingCart();
+    BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+    shoppingCart.setUserId(userId);
+    List<ShoppingCart> shoppingCartList = shoppingCartMapper.list(shoppingCart);
+    // 4. 判断菜品或套餐的数量是否大于1
+    if (shoppingCartList != null && !shoppingCartList.isEmpty()) {
+      ShoppingCart cartItem = shoppingCartList.get(0);
+      Integer number = cartItem.getNumber();
+      if (number != null && number > 1) {
+        // 菜品或套餐数量大于1，则number减1
+        cartItem.setNumber(cartItem.getNumber() - 1);
+        // 执行更新
+        shoppingCartMapper.updateNumber(cartItem);
+      } else {
+        // 菜品或套餐数量等于1，则从购物车中删除该菜品或套餐
+        Long id = cartItem.getId();
+        shoppingCartMapper.deleteById(id);
+      }
+    }
   }
 
 }
