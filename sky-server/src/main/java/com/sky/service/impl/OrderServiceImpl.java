@@ -1,8 +1,11 @@
 package com.sky.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.AddressBook;
@@ -18,14 +21,19 @@ import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ShoppingCartMapper;
 import com.sky.mapper.UserMapper;
+import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
+import com.sky.vo.DishVO;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -152,5 +160,40 @@ public class OrderServiceImpl implements OrderService {
         .build();
 
     orderMapper.update(orders);
+  }
+
+  /**
+   * 用户分页查询历史订单
+   *
+   * @param page
+   * @param pageSize
+   * @param status
+   * @return
+   */
+  @Override
+  public PageResult pageQuery(OrdersPageQueryDTO ordersPageQueryDTO) {
+    PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+    Page<Orders> page = orderMapper.page(ordersPageQueryDTO);
+    // 若没有订单，则返回空
+    if (page == null || page.isEmpty()) {
+      return new PageResult(0, Collections.emptyList());
+    }
+    // 1. 批量拿 ID
+    List<Long> ids = page.stream().map(Orders::getId).collect(Collectors.toList());
+    // 2. 批量查订单明细
+    List<OrderDetail> orderDetailList = orderDetailMapper.listByOrderIds(ids);
+    // 3. 内存组装 VO（只塞 orderDetailList 即可）
+    List<OrderVO> orderVOList = page.stream().map(order -> {
+      OrderVO orderVO = new OrderVO();
+      BeanUtils.copyProperties(order, orderVO);
+      Long orderId = order.getId();
+      // 从批量数据中过滤出当前订单的明细，并收集为 List 塞给 VO
+      List<OrderDetail> orderDetailsById = orderDetailList.stream()
+          .filter(orderDetail -> orderDetail.getOrderId().equals(orderId))
+          .collect(Collectors.toList());
+      orderVO.setOrderDetailList(orderDetailsById);
+      return orderVO;
+    }).collect(Collectors.toList());
+    return new PageResult(page.getTotal(), orderVOList);
   }
 }

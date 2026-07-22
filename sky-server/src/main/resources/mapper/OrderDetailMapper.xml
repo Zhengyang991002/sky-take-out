@@ -11,4 +11,10 @@
              #{orderDetail.name}, #{orderDetail.image}, #{orderDetail.number}, #{orderDetail.amount})
         </foreach>
     </insert>
+    <select id="listByOrderIds" resultType="com.sky.entity.OrderDetail">
+        select * from order_detail where order_id in
+        <foreach collection="orderIds" item="orderId" open="(" close=")" separator=",">
+            #{orderId}
+        </foreach>
+    </select>
 </mapper>
