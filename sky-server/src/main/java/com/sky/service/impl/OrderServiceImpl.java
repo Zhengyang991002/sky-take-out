@@ -196,4 +196,17 @@ public class OrderServiceImpl implements OrderService {
     }).collect(Collectors.toList());
     return new PageResult(page.getTotal(), orderVOList);
   }
+
+  /**
+   * 根据id查询订单详情
+   * @param id
+   * @return
+   */
+  @Override
+  public OrderVO getOrderDetailById(Long id) {
+    OrderVO orderVO = orderMapper.getOrderById(id);
+    List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
+    orderVO.setOrderDetailList(orderDetailList);
+    return orderVO;
+  }
 }
