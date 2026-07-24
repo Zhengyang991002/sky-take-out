@@ -4,6 +4,8 @@ import com.github.pagehelper.Page;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderVO;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -59,4 +61,13 @@ public interface OrderMapper {
    */
   @Select("select count(id) from orders where status = #{status}")
   Integer countStatus(Integer toBeConfirmed);
+
+  /**
+   * 获取超时订单
+   * @param status
+   * @param orderTimeLimit
+   * @return
+   */
+  @Select("select * from orders where status = #{status} and order_time < #{orderTimeLimit}")
+  List<Orders> getTimeOutOrders(Integer status, LocalDateTime orderTimeLimit);
 }
