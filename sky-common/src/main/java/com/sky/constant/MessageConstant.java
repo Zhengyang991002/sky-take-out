@@ -24,5 +24,6 @@ public class MessageConstant {
     public static final String DISH_BE_RELATED_BY_SETMEAL = "当前菜品关联了套餐,不能停售或删除";
     public static final String ORDER_STATUS_ERROR = "订单状态错误";
     public static final String ORDER_NOT_FOUND = "订单不存在";
+    public static final String DISTANCE_TOO_FAR = "该地址与店家距离太远，无法配送";
 
 }

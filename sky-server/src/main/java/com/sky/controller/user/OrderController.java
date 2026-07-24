@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,9 +39,10 @@ public class OrderController {
    * @param ordersSubmitDTO
    * @return
    */
-  @RequestMapping("/submit")
+  @PostMapping("/submit")
   @ApiOperation("用户下单")
-  public Result<OrderSubmitVO> submit(@RequestBody OrdersSubmitDTO ordersSubmitDTO) {
+  public Result<OrderSubmitVO> submit(@RequestBody OrdersSubmitDTO ordersSubmitDTO)
+      throws Exception {
     log.info("用户下单提交: {}", ordersSubmitDTO);
     OrderSubmitVO orderSubmitVO = orderService.submit(ordersSubmitDTO);
     return Result.success(orderSubmitVO);
@@ -74,11 +76,54 @@ public class OrderController {
     return Result.success(pageResult);
   }
 
+  /**
+   * 查看订单详情
+   * @param id
+   * @return
+   */
   @GetMapping("/orderDetail/{id}")
   @ApiOperation("查询订单详情")
   public Result<OrderVO> getOrderDetailById(@PathVariable Long id) {
     log.info("查询订单详情，订单id为:{}", id);
     OrderVO orderVO = orderService.getOrderDetailById(id);
     return Result.success(orderVO);
+  }
+
+  /**
+   * 取消订单
+   * @param id
+   * @return
+   */
+  @PutMapping("/cancel/{id}")
+  @ApiOperation("取消订单")
+  public Result cancel(@PathVariable Long id) throws Exception {
+    log.info("取消订单id:{}", id);
+    orderService.cancel(id);
+    return Result.success();
+  }
+
+  /**
+   * 再来一单
+   * @param id
+   * @return
+   */
+  @ApiOperation("再来一单")
+  @PostMapping("/repetition/{id}")
+  public Result reorder(@PathVariable Long id) {
+    log.info("再来一单id:{}", id);
+    orderService.reorder(id);
+    return Result.success();
+  }
+
+  /**
+   * 订单催单
+   * @param id
+   * @return
+   */
+  @GetMapping("/reminder/{id}")
+  @ApiOperation("催单")
+  public Result reminder(@PathVariable Long id) {
+    log.info("催单id:{}", id);
+    return Result.success();
   }
 }
